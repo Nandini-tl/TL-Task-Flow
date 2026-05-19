@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "taskName": "Complete API",
+    "assignedBy": "nandini",
+    "assignedTo": "nandini",
+    "deadline": "6PM",
+    "status": "completed",
+    "reminderSent": false
+  },
+  {
+    "id": 2,
+    "taskName": "system design",
+    "assignedBy": "sangeetha",
+    "assignedTo": "nandini",
+    "deadline": "6pm",
+    "status": "pending",
+    "reminderSent": false
+  },
+  {
+    "id": 3,
+    "taskName": "Complete Project",
+    "assignedBy": "nandini",
+    "assignedTo": "kavya",
+    "deadline": "6PM",
+    "status": "completed",
+    "reminderSent": false
+  },
+  {
+    "id": 4,
+    "taskName": "coplete the dashboard before",
+    "assignedBy": "kavya",
+    "assignedTo": "nandini",
+    "deadline": "6PM.",
+    "status": "pending",
+    "reminderSent": false
+  },
+  {
+    "id": 5,
+    "taskName": "@kavya complete the task",
+    "assignedBy": "kavya",
+    "assignedTo": "nandini",
+    "deadline": "8PM.",
+    "status": "completed",
+    "reminderSent": false
+  },
+  {
+    "id": 6,
+    "taskName": "Complete the movie",
+    "assignedBy": "nandini",
+    "assignedTo": "mythri",
+    "deadline": "8pm",
+    "status": "pending",
+    "reminderSent": false
+  },
+  {
+    "id": 7,
+    "taskName": "db",
+    "assignedBy": "nandini",
+    "assignedTo": "nandini",
+    "deadline": "1130",
+    "status": "pending",
+    "reminderSent": false
+  }
+]
