@@ -4,6 +4,7 @@ import { App } from "@slack/bolt";
 import { registerAssignCommand } from "./commands/assign";
 import { registerMyTasksCommand } from "./commands/mytasks";
 import { registerCompleteCommand } from "./commands/complete";
+import { startReminderService } from "./services/remainderService";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ const app = new App({
 registerAssignCommand(app);
 registerMyTasksCommand(app);
 registerCompleteCommand(app);
+startReminderService(app);
 
 (async () => {
   await app.start();

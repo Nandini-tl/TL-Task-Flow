@@ -6,19 +6,15 @@ export const registerCompleteCommand = (app: App) => {
     try {
       await ack();
 
-      // Get task ID from command
-      const taskId = Number(command.text);
+      const taskId = Number(command.text.trim());
 
-      // Validate task ID
-      if (isNaN(taskId)) {
+      // Validate
+      if (!taskId) {
         await respond(
-          "❌ Format: /complete taskId"
+          "❌ Format:\n/complete taskId"
         );
         return;
       }
-
-      // Current Slack username
-      const currentUser = command.user_name;
 
       // Read tasks
       const tasks = readTasks();
@@ -28,14 +24,13 @@ export const registerCompleteCommand = (app: App) => {
         (t: any) => t.id === taskId
       );
 
-      // Task not found
       if (!task) {
         await respond("❌ Task not found");
         return;
       }
 
-      // Check ownership
-      if (task.assignedTo !== currentUser) {
+      // Only assigned user can complete
+      if (task.assignedTo !== command.user_id) {
         await respond(
           "❌ You are not assigned to this task"
         );
@@ -45,31 +40,48 @@ export const registerCompleteCommand = (app: App) => {
       // Already completed
       if (task.status === "completed") {
         await respond(
-          "⚠️ Task already completed"
+          "✅ Task already completed"
         );
         return;
       }
 
-      // Update status
+      // Mark completed
       task.status = "completed";
 
-      // Save updated tasks
+      // Save
       writeTasks(tasks);
 
-      // Notify manager (optional)
-      // Currently using username storage
+      console.log("✅ TASK COMPLETED");
 
-      // Success response
+      /*
+        Notify Manager
+      */
+
+      await app.client.chat.postMessage({
+        token: process.env.SLACK_BOT_TOKEN,
+
+        channel: task.assignedBy,
+
+        text:
+          `✅ *Task Completed*\n\n` +
+          `📝 *Task:* ${task.taskName}\n` +
+          `👤 *Completed By:* <@${command.user_id}>`,
+      });
+
+      /*
+        Success Response
+      */
+
       await respond(
-        `✅ Task Completed Successfully\n\n` +
-        `🆔 ${task.id}\n` +
-        `📝 ${task.taskName}`
+        `✅ Task Completed Successfully`
       );
 
     } catch (error) {
-      console.error("Complete Error:", error);
+      console.error("❌ Complete Error:", error);
 
-      await respond("❌ Failed to complete task");
+      await respond(
+        "❌ Failed to complete task"
+      );
     }
   });
 };

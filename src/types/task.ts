@@ -5,5 +5,7 @@ export interface Task {
   assignedTo: string;
   deadline: string;
   status: "pending" | "completed";
+
   reminderSent: boolean;
+  overdueSent: boolean;
 }

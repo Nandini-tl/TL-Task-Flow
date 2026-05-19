@@ -6,40 +6,36 @@ export const registerMyTasksCommand = (app: App) => {
     try {
       await ack();
 
-      // Current Slack username
-      const currentUser = command.user_name;
-
-      // Read tasks
       const tasks = readTasks();
 
-      // Filter tasks for current user
+      // Current user's tasks
       const userTasks = tasks.filter(
         (task: any) =>
-          task.assignedTo === currentUser
+          task.assignedTo === command.user_id
       );
 
-      // No tasks
       if (userTasks.length === 0) {
         await respond("📭 No tasks assigned.");
         return;
       }
 
-      // Build response
-      const message = userTasks
+      const formattedTasks = userTasks
         .map(
           (task: any) =>
-            `🆔 ${task.id}\n` +
-            `📝 ${task.taskName}\n` +
-            `⏰ ${task.deadline}\n` +
-            `📌 ${task.status}\n`
+            `🆔 *Task ID:* ${task.id}\n` +
+            `📝 *Task:* ${task.taskName}\n` +
+            `👤 *Assigned By:* ${task.assignedByName}\n` +
+            `📌 *Status:* ${task.status}\n` +
+            `⏰ *Deadline:* ${task.deadline}`
         )
-        .join("\n");
+        .join("\n\n━━━━━━━━━━━━━━\n\n");
 
-      // Send response
-      await respond(message);
+      await respond(
+        `📋 *Your Tasks*\n\n${formattedTasks}`
+      );
 
     } catch (error) {
-      console.error("MyTasks Error:", error);
+      console.error("❌ MyTasks Error:", error);
 
       await respond("❌ Failed to fetch tasks");
     }
