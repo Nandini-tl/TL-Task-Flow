@@ -1,5 +1,6 @@
 import { App } from "@slack/bolt";
 import { readTasks, writeTasks } from "../utils/fileHelper";
+import { buildTaskCard } from "../services/messageService";
 
 export const registerAssignCommand = (app: App) => {
   app.command("/assign", async ({ command, ack, respond }) => {
@@ -110,16 +111,32 @@ export const registerAssignCommand = (app: App) => {
         Send DM To Assigned User
       */
 
+      // await app.client.chat.postMessage({
+      //   token: process.env.SLACK_BOT_TOKEN,
+
+      //   channel: assignedTo,
+
+      //   text:
+      //     `📌 *New Task Assigned*\n\n` +
+      //     `📝 *Task:* ${taskName}\n` +
+      //     `⏰ *Deadline:* ${deadline}\n` +
+      //     `👤 *Assigned By:* @${command.user_name}`,
+      // });/
       await app.client.chat.postMessage({
         token: process.env.SLACK_BOT_TOKEN,
 
         channel: assignedTo,
 
-        text:
-          `📌 *New Task Assigned*\n\n` +
-          `📝 *Task:* ${taskName}\n` +
-          `⏰ *Deadline:* ${deadline}\n` +
-          `👤 *Assigned By:* @${command.user_name}`,
+        text: "New Task Assigned",
+
+        blocks: buildTaskCard({
+          id: newTask.id,
+          taskName,
+          assignedBy: command.user_id,
+          assignedTo,
+          deadline,
+          status: "pending",
+        }),
       });
 
       /*

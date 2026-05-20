@@ -22,11 +22,11 @@ export const registerMyTasksCommand = (app: App) => {
       const formattedTasks = userTasks
         .map(
           (task: any) =>
-            `🆔 *Task ID:* ${task.id}\n` +
-            `📝 *Task:* ${task.taskName}\n` +
-            `👤 *Assigned By:* ${task.assignedByName}\n` +
-            `📌 *Status:* ${task.status}\n` +
-            `⏰ *Deadline:* ${task.deadline}`
+            ` *Task ID:* ${task.id}\n` +
+            ` *Task:* ${task.taskName}\n` +
+            ` *Assigned By:* ${task.assignedByName}\n` +
+            ` *Status:* ${task.status}\n` +
+            ` *Deadline:* ${task.deadline}`
         )
         .join("\n\n━━━━━━━━━━━━━━\n\n");
 

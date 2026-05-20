@@ -9,11 +9,11 @@ import { readTasks, writeTasks } from "../utils/fileHelper";
 dayjs.extend(customParseFormat);
 
 export const startReminderService = (app: App) => {
-  console.log("✅ Reminder Service Started");
+  // console.log("✅ Reminder Service Started");
 
   // Runs every minute
   cron.schedule("* * * * *", async () => {
-    console.log("⏰ Checking reminders...");
+    // console.log("⏰ Checking reminders...");
 
     const tasks = readTasks();
 
@@ -26,7 +26,7 @@ export const startReminderService = (app: App) => {
           continue;
         }
 
-        console.log("📌 Task:", task.taskName);
+        // console.log("📌 Task:", task.taskName);
 
         // Current time
         const now = dayjs();
@@ -37,20 +37,20 @@ export const startReminderService = (app: App) => {
           "YYYY-MM-DD HH:mm"
         );
 
-        console.log(
-          "🕒 Current Time:",
-          now.format("YYYY-MM-DD HH:mm")
-        );
+        // console.log(
+        //   "🕒 Current Time:",
+        //   now.format("YYYY-MM-DD HH:mm")
+        // );
 
-        console.log(
-          "⏳ Deadline:",
-          deadline.format("YYYY-MM-DD HH:mm")
-        );
+        // console.log(
+        //   "⏳ Deadline:",
+        //   deadline.format("YYYY-MM-DD HH:mm")
+        // );
 
         // Difference in minutes
         const diff = deadline.diff(now, "minute");
 
-        console.log("⌛ Diff:", diff);
+        // console.log("⌛ Diff:", diff);
 
         /*
           Reminder Logic
@@ -63,8 +63,8 @@ export const startReminderService = (app: App) => {
             !task.reminderSent
             ) {
             try {
-                console.log("🚀 Sending reminder...");
-                console.log("USER:", task.assignedTo);
+                // console.log("🚀 Sending reminder...");
+                // console.log("USER:", task.assignedTo);
 
                 const response = await app.client.chat.postMessage({
                 token: process.env.SLACK_BOT_TOKEN,
@@ -75,15 +75,15 @@ export const startReminderService = (app: App) => {
                     `🕒 Deadline: ${task.deadline}`,
                 });
 
-                console.log("✅ Reminder Sent");
-                console.log(response);
+                // console.log("✅ Reminder Sent");
+                // console.log(response);
 
                 task.reminderSent = true;
                 updated = true;
 
             } catch (error: any) {
-                console.log("❌ SLACK ERROR:");
-                console.log(error.data || error);
+                // console.log("❌ SLACK ERROR:");
+                // console.log(error.data || error);
             }
             }
 
@@ -95,7 +95,7 @@ export const startReminderService = (app: App) => {
           now.isAfter(deadline) &&
           !task.overdueSent
         ) {
-          console.log("⚠️ Sending overdue alert...");
+          // console.log("⚠️ Sending overdue alert...");
 
           // Notify assignee
           await app.client.chat.postMessage({
