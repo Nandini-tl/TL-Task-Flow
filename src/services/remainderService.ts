@@ -71,8 +71,8 @@ export const startReminderService = (app: App) => {
                 channel: task.assignedTo,
                 text:
                     `⏰ *Task Reminder*\n\n` +
-                    `📌 Task: ${task.taskName}\n` +
-                    `🕒 Deadline: ${task.deadline}`,
+                    `Task: ${task.taskName}\n` +
+                    `Deadline: ${task.deadline}`,
                 });
 
                 // console.log("✅ Reminder Sent");

@@ -106,49 +106,39 @@ export const registerAssignCommand = (app: App) => {
 
       console.log("✅ TASK CREATED");
       console.log(newTask);
-
-      /*
-        Send DM To Assigned User
-      */
-
-      // await app.client.chat.postMessage({
-      //   token: process.env.SLACK_BOT_TOKEN,
-
-      //   channel: assignedTo,
-
-      //   text:
-      //     `📌 *New Task Assigned*\n\n` +
-      //     `📝 *Task:* ${taskName}\n` +
-      //     `⏰ *Deadline:* ${deadline}\n` +
-      //     `👤 *Assigned By:* @${command.user_name}`,
-      // });/
-      await app.client.chat.postMessage({
-        token: process.env.SLACK_BOT_TOKEN,
-
-        channel: assignedTo,
-
-        text: "New Task Assigned",
-
-        blocks: buildTaskCard({
-          id: newTask.id,
-          taskName,
-          assignedBy: command.user_id,
-          assignedTo,
-          deadline,
-          status: "pending",
-        }),
-      });
-
-      /*
-        Success Response To Manager
-      */
-
       await respond(
         `✅ *Task Sent Successfully*\n\n` +
         `👤 *Assigned To:* @${username}\n` +
         `📝 *Task:* ${taskName}\n` +
         `⏰ *Deadline:* ${deadline}`
       );
+
+      /*
+        Send DM To Assigned User
+      */
+
+      await app.client.chat.postMessage({
+      token: process.env.SLACK_BOT_TOKEN,
+
+      channel: assignedTo,
+
+      text: "New Task Assigned",
+
+      blocks: buildTaskCard({
+        id: newTask.id,
+        taskName,
+        assignedBy: command.user_id,
+        assignedTo,
+        deadline,
+        status: "pending",
+      }),
+    });
+
+      /*
+        Success Response To Manager
+      */
+
+      
 
     } catch (error) {
       console.error("❌ Assign Error:", error);
