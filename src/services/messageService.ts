@@ -5,125 +5,227 @@ export const buildTaskCard = ({
   assignedTo,
   deadline,
   status,
+  priority,
 }: any) => {
 
+  /*
+    STATUS CONFIG
+  */
+
   const statusConfig: any = {
-    pending: "🟡 Pending",
-    completed: "🟢 Completed",
-    overdue: "🔴 Overdue",
-    upcoming: "⏰ Upcoming",
+
+    pending:
+      "🟡 Pending",
+
+    completed:
+      "🟢 Completed",
+
+    overdue:
+      "🔴 Overdue",
+
+    upcoming:
+      "⏰ Upcoming",
+  };
+
+  /*
+    PRIORITY CONFIG
+  */
+
+  const priorityConfig: any = {
+
+    high:
+      "🔴 High",
+
+    medium:
+      "🟡 Medium",
+
+    low:
+      "🟢 Low",
   };
 
   return [
 
-    // Top Divider
+    /*
+      TOP DIVIDER
+    */
+
     {
-      type: "divider",
+      type:
+        "divider",
     },
 
-    // Header
+    /*
+      HEADER
+    */
+
     {
-      type: "header",
+      type:
+        "header",
 
       text: {
-        type: "plain_text",
 
-        text: "📌 TASK ASSIGNED",
+        type:
+          "plain_text",
+
+        text:
+          "📌 TASK ASSIGNED",
       },
     },
 
-    // Task ID + Status
+    /*
+      TASK ID + STATUS
+    */
+
     {
-      type: "context",
+      type:
+        "context",
 
       elements: [
+
         {
-          type: "mrkdwn",
+          type:
+            "mrkdwn",
 
           text:
-            `*Task ID:* #${id}    •    ` +
+
+            `*Task ID:* #${id}   •   ` +
+
             `*Status:* ${statusConfig[status]}`,
         },
       ],
     },
 
-    // Task Name
+    /*
+      TASK NAME
+    */
+
     {
-      type: "section",
+      type:
+        "section",
 
       text: {
-        type: "mrkdwn",
 
-        text: `* ${taskName}*`,
+        type:
+          "mrkdwn",
+
+        text:
+          `*${taskName}*`,
       },
     },
 
-    // Details
+    /*
+      DETAILS SECTION
+    */
+
     {
-      type: "section",
+      type:
+        "section",
 
       fields: [
 
+        /*
+          ASSIGNED TO
+        */
+
         {
-          type: "mrkdwn",
+          type:
+            "mrkdwn",
 
           text:
-            `* Assigned To:* <@${assignedTo}>`,
+
+            `*Assigned To:* <@${assignedTo}>`,
         },
 
+        /*
+          ASSIGNED BY
+        */
+
         {
-          type: "mrkdwn",
+          type:
+            "mrkdwn",
 
           text:
-            `* Assigned By:* <@${assignedBy}>`,
+
+            `*Assigned By:* <@${assignedBy}>`,
         },
 
+        /*
+          DEADLINE
+        */
+
         {
-          type: "mrkdwn",
+          type:
+            "mrkdwn",
 
           text:
-            `* Deadline:* ${deadline}`,
+
+            `*Deadline:* ${deadline}`,
         },
 
+        /*
+          PRIORITY
+        */
+
         {
-          type: "mrkdwn",
+          type:
+            "mrkdwn",
 
           text:
-            `* Current Status:* ${statusConfig[status]}`,
+
+            `*Priority:* ${priorityConfig[priority]}`,
         },
       ],
     },
 
-    // Complete Button only for pending
+    /*
+      COMPLETE BUTTON
+    */
+
     ...(status === "pending"
+
       ? [
+
           {
-            type: "actions",
+            type:
+              "actions",
 
             elements: [
+
               {
-                type: "button",
+                type:
+                  "button",
 
                 text: {
-                  type: "plain_text",
 
-                  text: "✅ Mark Complete",
+                  type:
+                    "plain_text",
+
+                  text:
+                    "✅ Mark Complete",
                 },
 
-                style: "primary",
+                style:
+                  "primary",
 
-                action_id: "complete_task",
+                action_id:
+                  "complete_task",
 
-                value: String(id),
+                value:
+                  String(id),
               },
             ],
           },
         ]
+
       : []),
 
-    // Bottom Divider
+    /*
+      BOTTOM DIVIDER
+    */
+
     {
-      type: "divider",
+      type:
+        "divider",
     },
   ];
 };
