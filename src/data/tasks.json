@@ -1,125 +1,66 @@
 [
   {
-    "id": 1779776046728,
-    "taskName": "nnaa",
+    "id": 1779867238740,
+    "assignmentType": "channel",
+    "assignedChannelId": "C0B6A7P41S5",
+    "taskName": "ping",
     "assignedBy": "U0B4PU9THLJ",
     "assignedByName": "nandini",
-    "assignedTo": "U0B4PU9THLJ",
-    "deadline": "2026-05-26 12:00",
+    "assignedUsers": [
+      {
+        "userId": "U0B4PU9THLJ",
+        "userName": "nandini",
+        "completed": false,
+        "completedAt": null
+      },
+      {
+        "userId": "U0B5KAUN7Q8",
+        "userName": "kavya",
+        "completed": false,
+        "completedAt": null
+      }
+    ],
+    "deadline": "2026-05-28 12:00",
     "priority": "low",
-    "status": "completed",
-    "reminderSent": true,
-    "overdueSent": false
-  },
-  {
-    "id": 1779776064048,
-    "taskName": "complete slack project.",
-    "assignedBy": "U0B5KAUN7Q8",
-    "assignedByName": "kavya",
-    "assignedTo": "U0B5J7H95JL",
-    "deadline": "2027-05-20 15:00",
-    "priority": "low",
     "status": "pending",
+    "progress": {
+      "completed": 0,
+      "total": 2
+    },
     "reminderSent": false,
-    "overdueSent": false
+    "overdueSent": false,
+    "userMessages": []
   },
   {
-    "id": 1779776119524,
-    "taskName": "complete the slack project.",
+    "id": 1779867448609,
+    "assignmentType": "channel",
+    "assignedChannelId": "C0B6A7P41S5",
+    "taskName": "happy",
     "assignedBy": "U0B4PU9THLJ",
     "assignedByName": "nandini",
-    "assignedTo": "U0B5KAUN7Q8",
-    "deadline": "2026-06-26 13:00",
-    "priority": "high",
-    "status": "pending",
-    "reminderSent": false,
-    "overdueSent": false
-  },
-  {
-    "id": 1779776387860,
-    "taskName": "added priority",
-    "assignedBy": "U0B4PU9THLJ",
-    "assignedByName": "nandini",
-    "assignedTo": "U0B4PU9THLJ",
-    "deadline": "2026-05-26 13:00",
-    "priority": "medium",
-    "status": "completed",
-    "reminderSent": false,
-    "overdueSent": false
-  },
-  {
-    "id": 1779776490043,
-    "taskName": "checking priority",
-    "assignedBy": "U0B4PU9THLJ",
-    "assignedByName": "nandini",
-    "assignedTo": "U0B4PU9THLJ",
-    "deadline": "2026-05-27 15:00",
-    "priority": "low",
-    "status": "completed",
-    "reminderSent": false,
-    "overdueSent": false
-  },
-  {
-    "id": 1779776532282,
-    "taskName": "high",
-    "assignedBy": "U0B4PU9THLJ",
-    "assignedByName": "nandini",
-    "assignedTo": "U0B4PU9THLJ",
-    "deadline": "2026-05-27 13:00",
-    "priority": "high",
-    "status": "completed",
-    "reminderSent": false,
-    "overdueSent": false
-  },
-  {
-    "id": 1779777264080,
-    "taskName": "checking view assign",
-    "assignedBy": "U0B4PU9THLJ",
-    "assignedByName": "nandini",
-    "assignedTo": "U0B5KAUN7Q8",
-    "deadline": "2026-05-27 13:00",
-    "priority": "high",
-    "status": "pending",
-    "reminderSent": false,
-    "overdueSent": false
-  },
-  {
-    "id": 1779777642518,
-    "taskName": "gtyuio",
-    "assignedBy": "U0B4PU9THLJ",
-    "assignedByName": "nandini",
-    "assignedTo": "U0B5KAUN7Q8",
-    "assignedToName": "kavya",
-    "deadline": "2026-05-26 15:00",
-    "priority": "high",
-    "status": "pending",
-    "reminderSent": false,
-    "overdueSent": false
-  },
-  {
-    "id": 1779778376362,
-    "taskName": "complete the project",
-    "assignedBy": "U0B5KAUN7Q8",
-    "assignedByName": "kavya",
-    "assignedTo": "U0B4PU9THLJ",
-    "assignedToName": "nandini",
-    "deadline": "2026-05-28 14:00",
+    "assignedUsers": [
+      {
+        "userId": "U0B4PU9THLJ",
+        "userName": "nandini",
+        "completed": false,
+        "completedAt": null
+      },
+      {
+        "userId": "U0B5KAUN7Q8",
+        "userName": "kavya",
+        "completed": false,
+        "completedAt": null
+      }
+    ],
+    "deadline": "2026-05-29 15:00",
     "priority": "medium",
     "status": "pending",
+    "progress": {
+      "completed": 0,
+      "total": 2
+    },
     "reminderSent": false,
-    "overdueSent": false
-  },
-  {
-    "id": 1779778528221,
-    "taskName": "complete the new task",
-    "assignedBy": "U0B5KAUN7Q8",
-    "assignedByName": "kavya",
-    "assignedTo": "U0B4PU9THLJ",
-    "assignedToName": "nandini",
-    "deadline": "2026-05-30 17:00",
-    "priority": "low",
-    "status": "pending",
-    "reminderSent": false,
-    "overdueSent": false
+    "overdueSent": false,
+    "userMessages": []
   }
 ]

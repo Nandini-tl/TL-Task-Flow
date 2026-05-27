@@ -1,12 +1,12 @@
 import { App } from "@slack/bolt";
 import { readTasks } from "../utils/fileHelper";
 
-export const registerMyTasksCommand = (
+export const registerViewAssignCommand = (
   app: App
 ) => {
 
   app.command(
-    "/mytasks",
+    "/viewassign",
 
     async ({
       command,
@@ -25,35 +25,33 @@ export const registerMyTasksCommand = (
           readTasks();
 
         /*
-          FILTER USER TASKS
+          FILTER TASKS
         */
-        const userTasks =
+        const pendingTasks =
           tasks.filter(
             (task: any) => {
 
-              /*
-                CHECK USER EXISTS
-                IN ASSIGNED USERS
-              */
-              const assignedUser =
-                task.assignedUsers?.find(
-                  (user: any) =>
-                    user.userId ===
-                    command.user_id
-                );
+              const assignedBy =
+                String(
+                  task.assignedBy || ""
+                ).trim();
 
-              /*
-                ONLY SHOW
-                PENDING TASKS
-              */
-              return (
-                assignedUser &&
-                assignedUser.completed === false &&
+              const currentUser =
+                String(
+                  command.user_id
+                ).trim();
+
+              const status =
                 String(
                   task.status || ""
                 )
                   .trim()
-                  .toLowerCase() ===
+                  .toLowerCase();
+
+              return (
+                assignedBy ===
+                  currentUser &&
+                status ===
                   "pending"
               );
             }
@@ -63,11 +61,11 @@ export const registerMyTasksCommand = (
           NO TASKS
         */
         if (
-          userTasks.length === 0
+          pendingTasks.length === 0
         ) {
 
           await respond(
-            "📭 No pending tasks."
+            "📭 No pending assigned tasks found."
           );
 
           return;
@@ -78,21 +76,35 @@ export const registerMyTasksCommand = (
         */
         const ID_WIDTH = 10;
         const TASK_WIDTH = 50;
-        const ASSIGNED_WIDTH = 15;
+        const USER_WIDTH = 25;
         const PRIORITY_WIDTH = 10;
+        const STATUS_WIDTH = 10;
         const DEADLINE_WIDTH = 18;
+
+        /*
+          TABLE TOTAL WIDTH
+        */
+        const TABLE_WIDTH =
+          ID_WIDTH +
+          TASK_WIDTH +
+          USER_WIDTH +
+          PRIORITY_WIDTH +
+          STATUS_WIDTH +
+          DEADLINE_WIDTH +
+          10;
 
         /*
           HEADER
         */
         let message =
-          "📋 *My Pending Tasks*\n\n```";
+          "📋 *Pending Assigned Tasks*\n\n```";
 
         message +=
           "ID".padEnd(ID_WIDTH) + " " +
           "TASK NAME".padEnd(TASK_WIDTH) + " " +
-          "ASSIGNED BY".padEnd(ASSIGNED_WIDTH) + " " +
+          "USER".padEnd(USER_WIDTH) + " " +
           "PRIORITY".padEnd(PRIORITY_WIDTH) + " " +
+          "STATUS".padEnd(STATUS_WIDTH) + " " +
           "DEADLINE".padEnd(DEADLINE_WIDTH) +
           "\n";
 
@@ -100,32 +112,56 @@ export const registerMyTasksCommand = (
           HEADER LINE
         */
         message +=
-          "─".repeat(110) +
+          "─".repeat(TABLE_WIDTH) +
           "\n";
 
         /*
-          TASK ROWS
+          TABLE ROWS
         */
-        userTasks.forEach(
+        pendingTasks.forEach(
           (task: any) => {
 
+            /*
+              TASK ID
+            */
             const id =
               String(task.id || "")
                 .slice(-8)
-                .padEnd(
-                  ID_WIDTH
-                );
+                .padEnd(ID_WIDTH);
 
-            const assignedBy =
+            /*
+              TASK NAME
+            */
+            const taskName =
               String(
-                task.assignedByName ||
-                "unknown"
-              )
-                .slice(0, 13)
+                task.taskName || ""
+              );
+
+            /*
+              GET USER NAMES
+            */
+            const userNames =
+
+              task.assignedUsers?.map(
+                (user: any) =>
+                  user.userName
+              ).join(", ") ||
+
+              "unknown";
+
+            /*
+              USER COLUMN
+            */
+            const user =
+              String(userNames)
+                .slice(0, 23)
                 .padEnd(
-                  ASSIGNED_WIDTH
+                  USER_WIDTH
                 );
 
+            /*
+              PRIORITY
+            */
             const priority =
               String(
                 task.priority || ""
@@ -135,6 +171,21 @@ export const registerMyTasksCommand = (
                   PRIORITY_WIDTH
                 );
 
+            /*
+              STATUS
+            */
+            const status =
+              String(
+                task.status || ""
+              )
+                .toUpperCase()
+                .padEnd(
+                  STATUS_WIDTH
+                );
+
+            /*
+              DEADLINE
+            */
             const deadline =
               String(
                 task.deadline || ""
@@ -147,9 +198,7 @@ export const registerMyTasksCommand = (
               WRAP TASK NAME
             */
             const words =
-              String(
-                task.taskName || ""
-              ).split(" ");
+              taskName.split(" ");
 
             const taskLines:
               string[] = [];
@@ -164,8 +213,8 @@ export const registerMyTasksCommand = (
                   (
                     currentLine +
                     word
-                  ).length <=
-                  TASK_WIDTH - 1
+                  ).length <
+                  TASK_WIDTH - 2
                 ) {
 
                   currentLine +=
@@ -183,8 +232,11 @@ export const registerMyTasksCommand = (
               }
             );
 
+            /*
+              PUSH LAST LINE
+            */
             if (
-              currentLine.trim()
+              currentLine
             ) {
 
               taskLines.push(
@@ -193,13 +245,13 @@ export const registerMyTasksCommand = (
             }
 
             /*
-              FIRST LINE
+              FIRST ROW
             */
             message +=
-              `${id} ${taskLines[0].padEnd(TASK_WIDTH)} ${assignedBy} ${priority} ${deadline}\n`;
+              `${id} ${taskLines[0].padEnd(TASK_WIDTH)} ${user} ${priority} ${status} ${deadline}\n`;
 
             /*
-              EXTRA LINES
+              EXTRA TASK LINES
             */
             for (
               let i = 1;
@@ -212,11 +264,12 @@ export const registerMyTasksCommand = (
             }
 
             /*
-              HORIZONTAL LINE
+              ROW SEPARATOR
             */
             message +=
-              "─".repeat(110) +
-              "\n";
+              "─".repeat(
+                TABLE_WIDTH
+              ) + "\n";
           }
         );
 
@@ -235,12 +288,12 @@ export const registerMyTasksCommand = (
       } catch (error) {
 
         console.error(
-          "❌ MyTasks Error:",
+          "❌ View Assign Error:",
           error
         );
 
         await respond(
-          "❌ Failed to fetch tasks"
+          "❌ Failed to fetch assigned tasks."
         );
       }
     }

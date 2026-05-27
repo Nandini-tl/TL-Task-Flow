@@ -9,6 +9,14 @@ export const buildTaskCard = ({
 }: any) => {
 
   /*
+    UNIQUE TIMESTAMP
+    FOR SLACK REFRESH
+  */
+
+  const refreshId =
+    Date.now();
+
+  /*
     STATUS CONFIG
   */
 
@@ -62,6 +70,9 @@ export const buildTaskCard = ({
       type:
         "header",
 
+      block_id:
+        `header_${id}_${refreshId}`,
+
       text: {
 
         type:
@@ -79,6 +90,9 @@ export const buildTaskCard = ({
     {
       type:
         "context",
+
+      block_id:
+        `context_${id}_${refreshId}`,
 
       elements: [
 
@@ -103,6 +117,9 @@ export const buildTaskCard = ({
       type:
         "section",
 
+      block_id:
+        `taskname_${id}_${refreshId}`,
+
       text: {
 
         type:
@@ -120,6 +137,9 @@ export const buildTaskCard = ({
     {
       type:
         "section",
+
+      block_id:
+        `details_${id}_${refreshId}`,
 
       fields: [
 
@@ -188,6 +208,9 @@ export const buildTaskCard = ({
           {
             type:
               "actions",
+
+            block_id:
+              `actions_${id}_${refreshId}`,
 
             elements: [
 

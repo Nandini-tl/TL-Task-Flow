@@ -78,15 +78,18 @@ export const registerAssignCommand = (
             blocks: [
 
               /*
-                USER SELECT
+                USERS
               */
 
               {
                 type:
                   "input",
 
+                optional:
+                  true,
+
                 block_id:
-                  "assign_user_block",
+                  "assign_users_block",
 
                 label: {
 
@@ -94,16 +97,16 @@ export const registerAssignCommand = (
                     "plain_text",
 
                   text:
-                    "Assign To",
+                    "Assign Users",
                 },
 
                 element: {
 
                   type:
-                    "users_select",
+                    "multi_users_select",
 
                   action_id:
-                    "assign_user_input",
+                    "assign_users_input",
 
                   placeholder: {
 
@@ -111,7 +114,60 @@ export const registerAssignCommand = (
                       "plain_text",
 
                     text:
-                      "Select User",
+                      "Select Team Members",
+                  },
+                },
+              },
+
+              /*
+                CHANNEL
+              */
+
+              {
+                type:
+                  "input",
+
+                optional:
+                  true,
+
+                block_id:
+                  "channel_block",
+
+                label: {
+
+                  type:
+                    "plain_text",
+
+                  text:
+                    "Assign Channel",
+                },
+
+                element: {
+
+                  type:
+                    "conversations_select",
+
+                  action_id:
+                    "channel_input",
+
+                  default_to_current_conversation:
+                    false,
+
+                  filter: {
+
+                    include: [
+                      "public",
+                      "private",
+                    ],
+                  },
+
+                  placeholder: {
+
+                    type:
+                      "plain_text",
+
+                    text:
+                      "Select Channel",
                   },
                 },
               },
@@ -143,20 +199,11 @@ export const registerAssignCommand = (
 
                   action_id:
                     "task_name_input",
-
-                  placeholder: {
-
-                    type:
-                      "plain_text",
-
-                    text:
-                      "Enter task name",
-                  },
                 },
               },
 
               /*
-                DATE PICKER
+                DATE
               */
 
               {
@@ -186,7 +233,7 @@ export const registerAssignCommand = (
               },
 
               /*
-                TIME SELECTOR
+                TIME
               */
 
               {
@@ -243,32 +290,6 @@ export const registerAssignCommand = (
                           "plain_text",
 
                         text:
-                          "10:00 AM",
-                      },
-
-                      value:
-                        "10:00",
-                    },
-
-                    {
-                      text: {
-                        type:
-                          "plain_text",
-
-                        text:
-                          "11:00 AM",
-                      },
-
-                      value:
-                        "11:00",
-                    },
-
-                    {
-                      text: {
-                        type:
-                          "plain_text",
-
-                        text:
                           "12:00 PM",
                       },
 
@@ -282,63 +303,11 @@ export const registerAssignCommand = (
                           "plain_text",
 
                         text:
-                          "01:00 PM",
-                      },
-
-                      value:
-                        "13:00",
-                    },
-
-                    {
-                      text: {
-                        type:
-                          "plain_text",
-
-                        text:
-                          "02:00 PM",
-                      },
-
-                      value:
-                        "14:00",
-                    },
-
-                    {
-                      text: {
-                        type:
-                          "plain_text",
-
-                        text:
                           "03:00 PM",
                       },
 
                       value:
                         "15:00",
-                    },
-
-                    {
-                      text: {
-                        type:
-                          "plain_text",
-
-                        text:
-                          "04:00 PM",
-                      },
-
-                      value:
-                        "16:00",
-                    },
-
-                    {
-                      text: {
-                        type:
-                          "plain_text",
-
-                        text:
-                          "05:00 PM",
-                      },
-
-                      value:
-                        "17:00",
                     },
 
                     {
@@ -468,21 +437,30 @@ export const registerAssignCommand = (
 
       try {
 
-        await ack();
-
         /*
-          GET USER
+          USERS
         */
 
-        const assignedTo =
+        const selectedUsers =
 
           view.state.values
-            .assign_user_block
-            .assign_user_input
-            .selected_user;
+            .assign_users_block
+            .assign_users_input
+            .selected_users;
 
         /*
-          GET TASK NAME
+          CHANNEL
+        */
+
+        const selectedChannel =
+
+          view.state.values
+            .channel_block
+            .channel_input
+            .selected_conversation;
+
+        /*
+          TASK NAME
         */
 
         const taskName =
@@ -493,7 +471,7 @@ export const registerAssignCommand = (
             .value;
 
         /*
-          GET DATE
+          DATE
         */
 
         const selectedDate =
@@ -504,7 +482,7 @@ export const registerAssignCommand = (
             .selected_date;
 
         /*
-          GET TIME
+          TIME
         */
 
         const selectedTime =
@@ -517,14 +495,7 @@ export const registerAssignCommand = (
           "10:00";
 
         /*
-          FINAL DEADLINE
-        */
-
-        const deadline =
-          `${selectedDate} ${selectedTime}`;
-
-        /*
-          GET PRIORITY
+          PRIORITY
         */
 
         const priority =
@@ -537,106 +508,333 @@ export const registerAssignCommand = (
           "medium";
 
         /*
-          VALIDATE
+          FUTURE DATE VALIDATION
         */
 
+        const now =
+          new Date();
+
+        const selectedDeadline =
+          new Date(
+            `${selectedDate}T${selectedTime}:00`
+          );
+
         if (
-          !assignedTo ||
-          !taskName ||
-          !deadline
+          selectedDeadline <= now
         ) {
 
-          console.log(
-            "❌ INVALID DATA"
-          );
+          await ack({
+
+            response_action:
+              "errors",
+
+            errors: {
+
+              deadline_block:
+
+                "Deadline must be future date/time",
+            },
+          });
 
           return;
         }
 
         /*
-          READ TASKS
+          VALIDATE USERS / CHANNEL
         */
 
-        const tasks =
-          readTasks();
+        if (
+
+          (!selectedUsers ||
+            selectedUsers.length === 0)
+
+          &&
+
+          !selectedChannel
+        ) {
+
+          await ack({
+
+            response_action:
+              "errors",
+
+            errors: {
+
+              assign_users_block:
+
+                "Select users OR a channel",
+            },
+          });
+
+          return;
+        }
 
         /*
-          CREATE TASK
+          VALIDATE BOTH
         */
 
+        if (
+
+          selectedUsers &&
+          selectedUsers.length > 0
+
+          &&
+
+          selectedChannel
+        ) {
+
+          await ack({
+
+            response_action:
+              "errors",
+
+            errors: {
+
+              channel_block:
+
+                "Choose either users OR a channel",
+            },
+          });
+
+          return;
+        }
+
         /*
-  GET ASSIGNED USER INFO
+          TASK NAME VALIDATION
+        */
+
+        if (!taskName) {
+
+          await ack({
+
+            response_action:
+              "errors",
+
+            errors: {
+
+              task_name_block:
+
+                "Task name is required",
+            },
+          });
+
+          return;
+        }
+
+        /*
+          SUCCESS ACK
+        */
+
+        await ack();
+
+        /*
+          HEAVY WORK
+        */
+
+        setTimeout(
+
+          async () => {
+
+            try {
+
+              const deadline =
+                `${selectedDate} ${selectedTime}`;
+
+              /*
+                ASSIGNMENT TYPE
+              */
+
+              let assignmentType =
+                "multiple";
+
+              /*
+                FINAL USERS
+              */
+
+              let finalUsers =
+                selectedUsers || [];
+
+              /*
+                CHANNEL MEMBERS
+              */
+
+              if (
+                selectedChannel
+              ) {
+
+                assignmentType =
+                  "channel";
+
+                const membersResponse =
+
+                  await client.conversations.members({
+
+                    channel:
+                      selectedChannel,
+                  });
+
+                finalUsers =
+
+                  membersResponse.members
+                    ?.filter(
+
+                      (id: string) =>
+                        id.startsWith("U")
+                    ) || [];
+              }
+
+              /*
+                REMOVE DUPLICATES
+              */
+
+              finalUsers = [
+                ...new Set(finalUsers)
+              ];
+
+              /*
+                SINGLE USER
+              */
+
+              if (
+                finalUsers.length === 1
+              ) {
+
+                assignmentType =
+                  "single";
+              }
+
+              /*
+                ASSIGNED USERS
+              */
+
+              const assignedUsers =
+                await Promise.all(
+
+                  finalUsers.map(
+                    async (
+                      userId: string
+                    ) => {
+
+                      const userInfo =
+                        await client.users.info({
+
+                          user:
+                            userId,
+                        });
+
+                      return {
+
+                        userId,
+
+                        userName:
+
+                          userInfo.user?.name ||
+
+                          "unknown",
+
+                        completed:
+                          false,
+
+                        completedAt:
+                          null,
+                      };
+                    }
+                  )
+                );
+
+              /*
+                TASKS
+              */
+
+              const tasks =
+                readTasks();
+
+              /*
+                NEW TASK
+              */
+
+              const newTask: any = {
+
+                id:
+                  Date.now(),
+
+                assignmentType,
+
+                assignedChannelId:
+                  selectedChannel || null,
+
+                taskName,
+
+                assignedBy:
+                  body.user.id,
+
+                assignedByName:
+                  body.user.name,
+
+                assignedUsers,
+
+                deadline,
+
+                priority,
+
+                status:
+                  "pending",
+
+                progress: {
+
+                  completed: 0,
+
+                  total:
+                    assignedUsers.length,
+                },
+
+                reminderSent:
+                  false,
+
+                overdueSent:
+                  false,
+
+                /*
+                  MESSAGE STORAGE
+                */
+
+                userMessages: [],
+              };
+
+              /*
+                SAVE
+              */
+
+              tasks.push(newTask);
+
+              writeTasks(tasks);
+
+              /*
+  SEND TO USERS
 */
-const userInfo =
-  await client.users.info({
-    user: assignedTo,
-  });
 
-const assignedToName =
-  userInfo.user?.name ||
-  "unknown";
+await Promise.all(
 
-/*
-  CREATE TASK
-*/
-const newTask = {
+  assignedUsers.map(
 
-  id: Date.now(),
+    async (user: any) => {
 
-  taskName,
-
-  assignedBy:
-    body.user.id,
-
-  assignedByName:
-    body.user.name,
-
-  assignedTo,
-
-  // IMPORTANT FIX
-  assignedToName,
-
-  deadline,
-
-  priority,
-
-  status:
-    "pending",
-
-  reminderSent:
-    false,
-
-  overdueSent:
-    false,
-};
+      try {
 
         /*
-          SAVE TASK
+          OPEN DM
         */
 
-        tasks.push(newTask);
+        const dmResponse =
 
-        writeTasks(tasks);
+          await client.conversations.open({
 
-        console.log(
-          "✅ TASK CREATED"
-        );
-
-        /*
-          OPEN USER DM
-        */
-
-        const dm =
-          await client
-            .conversations
-            .open({
-
-              users:
-                assignedTo,
-            });
+            users:
+              user.userId,
+          });
 
         const channelId =
-          dm.channel?.id;
+          dmResponse.channel?.id;
 
         /*
           VALIDATE
@@ -645,49 +843,115 @@ const newTask = {
         if (!channelId) {
 
           console.log(
-            "❌ DM FAILED"
+            "❌ CHANNEL NOT FOUND"
           );
 
           return;
         }
 
         /*
-          SEND TASK CARD
+          SEND CARD
         */
 
-        await client.chat.postMessage({
+        const sentMessage =
 
-          channel:
+          await client.chat.postMessage({
+
+            channel:
+              channelId,
+
+            text:
+              "📌 New Task Assigned",
+
+            blocks:
+              buildTaskCard({
+
+                id:
+                  newTask.id,
+
+                taskName,
+
+                assignedBy:
+                  newTask.assignedBy,
+
+                assignedTo:
+                  user.userId,
+
+                deadline,
+
+                status:
+                  "pending",
+
+                priority,
+              }),
+          });
+
+        /*
+          STORE MESSAGE DATA
+        */
+
+        newTask.userMessages.push({
+
+          userId:
+            user.userId,
+
+          channelId:
             channelId,
 
-          text:
-            "📌 New Task Assigned",
-
-          blocks:
-            buildTaskCard({
-
-              id:
-                newTask.id,
-
-              taskName,
-
-              assignedBy:
-                newTask.assignedBy,
-
-              assignedTo,
-
-              deadline,
-
-              status:
-                "pending",
-
-              priority:
-                newTask.priority,
-            }),
+          messageTs:
+            sentMessage.ts,
         });
 
         console.log(
-          "✅ TASK SENT"
+          "✅ MESSAGE STORED"
+        );
+
+        console.log(
+          newTask.userMessages
+        );
+
+      } catch (error) {
+
+        console.log(
+          "❌ SEND FAILED:",
+          error
+        );
+      }
+    }
+  )
+);
+
+/*
+  SAVE AGAIN
+*/
+
+writeTasks(tasks);
+
+console.log(
+  "✅ TASK SAVED WITH MESSAGE DATA"
+);
+
+              /*
+                SAVE UPDATED TASK
+              */
+
+              writeTasks(tasks);
+
+              console.log(
+                "✅ TASK DISTRIBUTED"
+              );
+
+            } catch (error) {
+
+              console.log(
+                "❌ ASYNC ERROR:",
+                error
+              );
+            }
+
+          },
+
+          0
         );
 
       } catch (error) {

@@ -1,133 +1,430 @@
 import { App } from "@slack/bolt";
+
 import cron from "node-cron";
+
 import dayjs from "dayjs";
+
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
-import { readTasks, writeTasks } from "../utils/fileHelper";
+import {
+  readTasks,
+  writeTasks,
+} from "../utils/fileHelper";
 
-// Enable custom date parsing
-dayjs.extend(customParseFormat);
+/*
+  ENABLE DATE FORMAT
+*/
 
-export const startReminderService = (app: App) => {
-  // console.log("✅ Reminder Service Started");
+dayjs.extend(
+  customParseFormat
+);
 
-  // Runs every minute
-  cron.schedule("* * * * *", async () => {
-    // console.log("⏰ Checking reminders...");
+export const startReminderService = (
+  app: App
+) => {
 
-    const tasks = readTasks();
+  console.log(
+    "✅ Reminder Service Started"
+  );
 
-    let updated = false;
+  /*
+    RUN EVERY MINUTE
+  */
 
-    for (const task of tasks) {
-      try {
-        // Skip completed tasks
-        if (task.status === "completed") {
-          continue;
-        }
+  cron.schedule(
 
-        // console.log("📌 Task:", task.taskName);
+    "* * * * *",
 
-        // Current time
-        const now = dayjs();
+    async () => {
 
-        // Parse deadline
-        const deadline = dayjs(
-          task.deadline,
-          "YYYY-MM-DD HH:mm"
-        );
+      const tasks =
+        readTasks();
 
-        // console.log(
-        //   "🕒 Current Time:",
-        //   now.format("YYYY-MM-DD HH:mm")
-        // );
+      let updated =
+        false;
 
-        // console.log(
-        //   "⏳ Deadline:",
-        //   deadline.format("YYYY-MM-DD HH:mm")
-        // );
+      /*
+        LOOP TASKS
+      */
 
-        // Difference in minutes
-        const diff = deadline.diff(now, "minute");
+      for (
+        const task of tasks
+      ) {
 
-        // console.log("⌛ Diff:", diff);
+        try {
 
-        /*
-          Reminder Logic
-          Sends reminder when task is due within 5 mins
-        */
+          /*
+            SKIP COMPLETED
+          */
 
-        if (
+          if (
+            task.status ===
+            "completed"
+          ) {
+
+            continue;
+          }
+
+          /*
+            VALIDATE USERS
+          */
+
+          if (
+            !task.assignedUsers
+          ) {
+
+            continue;
+          }
+
+          /*
+            CURRENT TIME
+          */
+
+          const now =
+            dayjs();
+
+          /*
+            DEADLINE
+          */
+
+          const deadline =
+            dayjs(
+
+              task.deadline,
+
+              "YYYY-MM-DD HH:mm"
+            );
+
+          /*
+            DIFFERENCE
+          */
+
+          const diff =
+            deadline.diff(
+              now,
+              "minute"
+            );
+
+          /*
+            REMINDER
+          */
+
+          if (
+
             diff <= 60 &&
+
             diff >= 0 &&
+
             !task.reminderSent
+          ) {
+
+            console.log(
+              "⏰ Sending reminders..."
+            );
+
+            /*
+              SEND TO ALL
+              PENDING USERS
+            */
+
+            for (
+              const user of
+              task.assignedUsers
             ) {
+
+              try {
+
+                /*
+                  SKIP COMPLETED USERS
+                */
+
+                if (
+                  user.completed
+                ) {
+
+                  continue;
+                }
+
+                /*
+                  OPEN DM
+                */
+
+                const dm =
+                  await app.client
+                    .conversations
+                    .open({
+
+                      users:
+                        user.userId,
+                    });
+
+                const channelId =
+                  dm.channel?.id;
+
+                /*
+                  VALIDATE
+                */
+
+                if (
+                  !channelId
+                ) {
+
+                  continue;
+                }
+
+                /*
+                  SEND REMINDER
+                */
+
+                await app.client
+                  .chat
+                  .postMessage({
+
+                    channel:
+                      channelId,
+
+                    text:
+
+                      `⏰ *Task Reminder*\n\n` +
+
+                      `📝 Task: ${task.taskName}\n` +
+
+                      `📅 Deadline: ${task.deadline}\n` +
+
+                      `🔥 Priority: ${task.priority}`,
+                  });
+
+                console.log(
+
+                  "✅ Reminder Sent:",
+
+                  user.userName
+                );
+
+              } catch (error) {
+
+                console.log(
+
+                  "❌ Reminder Failed:",
+
+                  user.userName,
+
+                  error
+                );
+              }
+            }
+
+            /*
+              UPDATE FLAG
+            */
+
+            task.reminderSent =
+              true;
+
+            updated =
+              true;
+          }
+
+          /*
+            OVERDUE
+          */
+
+          if (
+
+            now.isAfter(
+              deadline
+            ) &&
+
+            !task.overdueSent
+          ) {
+
+            console.log(
+              "⚠️ Sending overdue alerts..."
+            );
+
+            /*
+              SEND TO ALL
+              PENDING USERS
+            */
+
+            for (
+              const user of
+              task.assignedUsers
+            ) {
+
+              try {
+
+                /*
+                  SKIP COMPLETED USERS
+                */
+
+                if (
+                  user.completed
+                ) {
+
+                  continue;
+                }
+
+                /*
+                  OPEN DM
+                */
+
+                const dm =
+                  await app.client
+                    .conversations
+                    .open({
+
+                      users:
+                        user.userId,
+                    });
+
+                const channelId =
+                  dm.channel?.id;
+
+                /*
+                  VALIDATE
+                */
+
+                if (
+                  !channelId
+                ) {
+
+                  continue;
+                }
+
+                /*
+                  SEND ALERT
+                */
+
+                await app.client
+                  .chat
+                  .postMessage({
+
+                    channel:
+                      channelId,
+
+                    text:
+
+                      `❌ *Task Overdue*\n\n` +
+
+                      `📝 ${task.taskName}\n` +
+
+                      `📅 Deadline Passed`,
+                  });
+
+                console.log(
+
+                  "⚠️ Overdue Alert:",
+
+                  user.userName
+                );
+
+              } catch (error) {
+
+                console.log(
+
+                  "❌ Overdue Failed:",
+
+                  user.userName,
+
+                  error
+                );
+              }
+            }
+
+            /*
+              MANAGER ALERT
+            */
+
             try {
-                // console.log("🚀 Sending reminder...");
-                // console.log("USER:", task.assignedTo);
 
-                const response = await app.client.chat.postMessage({
-                token: process.env.SLACK_BOT_TOKEN,
-                channel: task.assignedTo,
-                text:
-                    `⏰ *Task Reminder*\n\n` +
-                    `Task: ${task.taskName}\n` +
-                    `Deadline: ${task.deadline}`,
-                });
+              /*
+                OPEN MANAGER DM
+              */
 
-                // console.log("✅ Reminder Sent");
-                // console.log(response);
+              const managerDM =
+                await app.client
+                  .conversations
+                  .open({
 
-                task.reminderSent = true;
-                updated = true;
+                    users:
+                      task.assignedBy,
+                  });
 
-            } catch (error: any) {
-                // console.log("❌ SLACK ERROR:");
-                // console.log(error.data || error);
+              const managerChannel =
+                managerDM.channel?.id;
+
+              /*
+                VALIDATE
+              */
+
+              if (
+                managerChannel
+              ) {
+
+                await app.client
+                  .chat
+                  .postMessage({
+
+                    channel:
+                      managerChannel,
+
+                    text:
+
+                      `⚠️ *Task Overdue*\n\n` +
+
+                      `📝 ${task.taskName}\n` +
+
+                      `👥 Team task deadline exceeded`,
+                  });
+
+                console.log(
+                  "✅ Manager Notified"
+                );
+              }
+
+            } catch (error) {
+
+              console.log(
+
+                "❌ Manager Alert Failed:",
+
+                error
+              );
             }
-            }
 
-        /*
-          Overdue Logic
-        */
+            /*
+              UPDATE FLAG
+            */
 
-        if (
-          now.isAfter(deadline) &&
-          !task.overdueSent
-        ) {
-          // console.log("⚠️ Sending overdue alert...");
+            task.overdueSent =
+              true;
 
-          // Notify assignee
-          await app.client.chat.postMessage({
-            token: process.env.SLACK_BOT_TOKEN,
-            channel: task.assignedTo,
-            text:
-              `❌ *Task Overdue*\n\n` +
-              `📌 Task: ${task.taskName}`,
-          });
+            updated =
+              true;
+          }
 
-          // Notify manager
-          await app.client.chat.postMessage({
-            token: process.env.SLACK_BOT_TOKEN,
-            channel: task.assignedBy,
-            text:
-              `⚠️ Assigned task overdue\n\n` +
-              `📌 Task: ${task.taskName}`,
-          });
+        } catch (error) {
 
-          console.log("✅ Overdue Alert Sent");
-
-          task.overdueSent = true;
-          updated = true;
+          console.log(
+            "❌ Reminder Error:",
+            error
+          );
         }
-      } catch (error) {
-        console.log("❌ Reminder Error:", error);
+      }
+
+      /*
+        SAVE
+      */
+
+      if (
+        updated
+      ) {
+
+        writeTasks(
+          tasks
+        );
       }
     }
-
-    // Save updates
-    if (updated) {
-      writeTasks(tasks);
-    }
-  });
+  );
 };
