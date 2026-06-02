@@ -287,6 +287,30 @@ export const registerAssignCommand = (
                       value:
                         "09:00",
                     },
+                    {
+                      text: {
+                        type:
+                          "plain_text",
+
+                        text:
+                          "10:00 AM",
+                      },
+
+                      value:
+                        "10:00",
+                    },
+                    {
+                      text: {
+                        type:
+                          "plain_text",
+
+                        text:
+                          "11:00 AM",
+                      },
+
+                      value:
+                        "11:00",
+                    },
 
                     {
                       text: {
@@ -300,6 +324,30 @@ export const registerAssignCommand = (
                       value:
                         "12:00",
                     },
+                    {
+                      text: {
+                        type:
+                          "plain_text",
+
+                        text:
+                          "01:00 AM",
+                      },
+
+                      value:
+                        "13:00",
+                    },
+                    {
+                      text: {
+                        type:
+                          "plain_text",
+
+                        text:
+                          "02:00 AM",
+                      },
+
+                      value:
+                        "14:00",
+                    },
 
                     {
                       text: {
@@ -312,6 +360,30 @@ export const registerAssignCommand = (
 
                       value:
                         "15:00",
+                    },
+                    {
+                      text: {
+                        type:
+                          "plain_text",
+
+                        text:
+                          "04:00 AM",
+                      },
+
+                      value:
+                        "16:00",
+                    },
+                    {
+                      text: {
+                        type:
+                          "plain_text",
+
+                        text:
+                          "05:00 AM",
+                      },
+
+                      value:
+                        "17:00",
                     },
 
                     {

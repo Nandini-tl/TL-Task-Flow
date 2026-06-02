@@ -10,6 +10,7 @@ import {
   getTasks,
   updateTask,
 } from "./taskService";
+
 /*
   ENABLE DATE FORMAT
 */
@@ -23,21 +24,12 @@ export const startReminderService = (
 ) => {
 
   console.log(
-  "SERVER TIME:",
-  dayjs().format()
-);
-
-  console.log(
     "✅ Reminder Service Started"
   );
 
   /*
     RUN EVERY MINUTE
   */
- console.log(
-  "⏰ Reminder Cron Running",
-  new Date().toISOString()
-);
 
   cron.schedule(
 
@@ -46,12 +38,10 @@ export const startReminderService = (
     async () => {
 
       const tasks: any =
-        await getTasks();
-        console.log(
-  "TOTAL TASKS:",
-  tasks.length
-);
-    
+          await getTasks();
+
+      let updated =
+        false;
 
       /*
         LOOP TASKS
@@ -118,10 +108,7 @@ export const startReminderService = (
           /*
             REMINDER
           */
-console.log("NOW:", now.format());
-console.log("TASK DEADLINE:", task.deadline);
-console.log("PARSED:", deadline.format());
-console.log("DIFF:", diff); 
+
           if (
 
             diff <= 60 &&
@@ -234,15 +221,8 @@ console.log("DIFF:", diff);
             task.reminderSent =
               true;
 
-            await updateTask(
-
-              task.id,
-
-              {
-                reminderSent:
-                  true,
-              }
-            );
+            updated =
+              true;
           }
 
           /*
@@ -420,15 +400,8 @@ console.log("DIFF:", diff);
             task.overdueSent =
               true;
 
-            await updateTask(
-
-              task.id,
-
-              {
-                overdueSent:
-                  true,
-              }
-            );
+            updated =
+              true;
           }
 
         } catch (error) {
@@ -444,7 +417,28 @@ console.log("DIFF:", diff);
         SAVE
       */
 
+      if (
+  updated
+) {
 
+  for (
+    const task of tasks
+  ) {
+
+    await updateTask(
+
+      task.id,
+
+      {
+        reminderSent:
+          task.reminderSent,
+
+        overdueSent:
+          task.overdueSent,
+      }
+    );
+  }
+}
     }
   );
 };
