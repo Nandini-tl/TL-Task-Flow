@@ -29,13 +29,18 @@ export const startReminderService = (
 
   /*
     RUN EVERY MINUTE
-  */
 
+  */
+ 
   cron.schedule(
 
     "* * * * *",
 
     async () => {
+      console.log(
+      "🔄 CRON RUNNING:",
+      new Date()
+    );
 
       const tasks: any =
           await getTasks();
@@ -175,6 +180,7 @@ export const startReminderService = (
                 /*
                   SEND REMINDER
                 */
+               
 
                 await app.client
                   .chat
