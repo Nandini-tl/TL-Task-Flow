@@ -23,12 +23,21 @@ export const startReminderService = (
 ) => {
 
   console.log(
+  "SERVER TIME:",
+  dayjs().format()
+);
+
+  console.log(
     "✅ Reminder Service Started"
   );
 
   /*
     RUN EVERY MINUTE
   */
+ console.log(
+  "⏰ Reminder Cron Running",
+  new Date().toISOString()
+);
 
   cron.schedule(
 
@@ -38,7 +47,10 @@ export const startReminderService = (
 
       const tasks: any =
         await getTasks();
-
+        console.log(
+  "TOTAL TASKS:",
+  tasks.length
+);
     
 
       /*
@@ -106,7 +118,10 @@ export const startReminderService = (
           /*
             REMINDER
           */
-
+console.log("NOW:", now.format());
+console.log("TASK DEADLINE:", task.deadline);
+console.log("PARSED:", deadline.format());
+console.log("DIFF:", diff); 
           if (
 
             diff <= 60 &&

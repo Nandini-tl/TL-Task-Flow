@@ -9,6 +9,10 @@ import {
   buildTaskCard,
 } from "../services/messageService";
 
+import {
+  publishDashboard,
+} from "../services/dashboardService";
+
 export const registerAssignCommand = (
   app: App
 ) => {
@@ -937,6 +941,15 @@ await updateTask(
   console.log(
     "✅ TASK SAVED WITH MESSAGE DATA"
   );
+
+  await publishDashboard(
+  app,
+  body.user.id
+);
+
+console.log(
+  "✅ DASHBOARD REFRESHED AFTER TASK CREATION"
+);
 
               /*
                 SAVE UPDATED TASK
