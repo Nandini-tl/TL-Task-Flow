@@ -330,7 +330,7 @@ export const registerAssignCommand = (
                           "plain_text",
 
                         text:
-                          "01:00 AM",
+                          "01:00 PM",
                       },
 
                       value:
@@ -342,7 +342,7 @@ export const registerAssignCommand = (
                           "plain_text",
 
                         text:
-                          "02:00 AM",
+                          "02:00 PM",
                       },
 
                       value:
@@ -367,7 +367,7 @@ export const registerAssignCommand = (
                           "plain_text",
 
                         text:
-                          "04:00 AM",
+                          "04:00 PM",
                       },
 
                       value:
@@ -379,7 +379,7 @@ export const registerAssignCommand = (
                           "plain_text",
 
                         text:
-                          "05:00 AM",
+                          "05:00 PM",
                       },
 
                       value:

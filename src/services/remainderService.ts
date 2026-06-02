@@ -1,6 +1,8 @@
 import { App } from "@slack/bolt";
 
 import cron from "node-cron";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 import dayjs from "dayjs";
 
@@ -10,6 +12,9 @@ import {
   getTasks,
   updateTask,
 } from "./taskService";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 /*
   ENABLE DATE FORMAT
@@ -29,16 +34,25 @@ export const startReminderService = (
 
   /*
     RUN EVERY MINUTE
-  */
 
+  */
+ 
   cron.schedule(
 
     "* * * * *",
 
     async () => {
+      console.log(
+      "🔄 CRON RUNNING:",
+      new Date()
+    );
 
       const tasks: any =
           await getTasks();
+          console.log(
+  "TASK COUNT:",
+  tasks.length
+);
 
       let updated =
         false;
@@ -80,20 +94,17 @@ export const startReminderService = (
             CURRENT TIME
           */
 
-          const now =
-            dayjs();
+          const now = dayjs().tz("Asia/Kolkata");
 
           /*
             DEADLINE
           */
 
-          const deadline =
-            dayjs(
-
-              task.deadline,
-
-              "YYYY-MM-DD HH:mm"
-            );
+          const deadline = dayjs.tz(
+  task.deadline,
+  "YYYY-MM-DD HH:mm",
+  "Asia/Kolkata"
+);
 
           /*
             DIFFERENCE
@@ -104,6 +115,42 @@ export const startReminderService = (
               now,
               "minute"
             );
+            console.log(
+  "TASK:",
+  task.taskName
+);
+
+console.log(
+  "STATUS:",
+  task.status
+);
+
+console.log(
+  "DEADLINE:",
+  task.deadline
+);
+
+console.log(
+  "NOW:",
+  now.format(
+    "YYYY-MM-DD HH:mm"
+  )
+);
+
+console.log(
+  "DIFF:",
+  diff
+);
+
+console.log(
+  "REMINDER SENT:",
+  task.reminderSent
+);
+
+console.log(
+  "OVERDUE SENT:",
+  task.overdueSent
+);
 
           /*
             REMINDER
@@ -175,6 +222,7 @@ export const startReminderService = (
                 /*
                   SEND REMINDER
                 */
+               
 
                 await app.client
                   .chat
