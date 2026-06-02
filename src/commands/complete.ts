@@ -1,87 +1,164 @@
-import { App } from "@slack/bolt";
-import { readTasks, writeTasks } from "../utils/fileHelper";
+// import { App } from "@slack/bolt";
 
-export const registerCompleteCommand = (app: App) => {
-  app.command("/complete", async ({ command, ack, respond }) => {
-    try {
-      await ack();
+// import {
+//   getTaskById,
+//   updateTask,
+// } from "../services/taskService";
 
-      const taskId = Number(command.text.trim());
+// export const registerCompleteCommand = (
+//   app: App
+// ) => {
 
-      // Validate
-      if (!taskId) {
-        await respond(
-          "❌ Format:\n/complete taskId"
-        );
-        return;
-      }
+//   app.command(
 
-      // Read tasks
-      const tasks = readTasks();
+//     "/complete",
 
-      // Find task
-      const task = tasks.find(
-        (t: any) => t.id === taskId
-      );
+//     async ({
+//       command,
+//       ack,
+//       respond,
+//     }) => {
 
-      if (!task) {
-        await respond("❌ Task not found");
-        return;
-      }
+//       try {
 
-      // Only assigned user can complete
-      if (task.assignedTo !== command.user_id) {
-        await respond(
-          "❌ You are not assigned to this task"
-        );
-        return;
-      }
+//         await ack();
 
-      // Already completed
-      if (task.status === "completed") {
-        await respond(
-          "✅ Task already completed"
-        );
-        return;
-      }
+//         const taskId =
+//           Number(
+//             command.text.trim()
+//           );
 
-      // Mark completed
-      task.status = "completed";
+//         /*
+//           VALIDATE
+//         */
 
-      // Save
-      writeTasks(tasks);
+//         if (!taskId) {
 
-      console.log("✅ TASK COMPLETED");
+//           await respond(
 
-      /*
-        Notify Manager
-      */
+//             "❌ Format:\n/complete taskId"
+//           );
 
-      await app.client.chat.postMessage({
-        token: process.env.SLACK_BOT_TOKEN,
+//           return;
+//         }
 
-        channel: task.assignedBy,
+//         /*
+//           GET TASK FROM MONGODB
+//         */
 
-        text:
-          `✅ *Task Completed*\n\n` +
-          `📝 *Task:* ${task.taskName}\n` +
-          `👤 *Completed By:* <@${command.user_id}>`,
-      });
+//         const task =
+//           await getTaskById(
+//             taskId
+//           );
 
-      /*
-        Success Response
-      */
+//         /*
+//           TASK NOT FOUND
+//         */
 
-      await respond(
-        `✅ Task Completed Successfully`
-      );
+//         if (!task) {
 
-    } catch (error) {
-      console.error("❌ Complete Error:", error);
+//           await respond(
+//             "❌ Task not found"
+//           );
 
-      await respond(
-        "❌ Failed to complete task"
-      );
-    }
-  });
-};
+//           return;
+//         }
+
+//         /*
+//           ONLY ASSIGNED USER
+//         */
+
+//         if (
+//           task.assignedTo !==
+//           command.user_id
+//         ) {
+
+//           await respond(
+
+//             "❌ You are not assigned to this task"
+//           );
+
+//           return;
+//         }
+
+//         /*
+//           ALREADY COMPLETED
+//         */
+
+//         if (
+//           task.status ===
+//           "completed"
+//         ) {
+
+//           await respond(
+
+//             "✅ Task already completed"
+//           );
+
+//           return;
+//         }
+
+//         /*
+//           UPDATE TASK
+//         */
+
+//         await updateTask(
+
+//           taskId,
+
+//           {
+//             status:
+//               "completed",
+//           }
+//         );
+
+//         console.log(
+//           "✅ TASK COMPLETED"
+//         );
+
+//         /*
+//           NOTIFY MANAGER
+//         */
+
+//         await app.client.chat.postMessage({
+
+//           token:
+//             process.env
+//               .SLACK_BOT_TOKEN,
+
+//           channel:
+//             task.assignedBy,
+
+//           text:
+
+//             `✅ *Task Completed*\n\n` +
+
+//             `📝 *Task:* ${task.taskName}\n` +
+
+//             `👤 *Completed By:* <@${command.user_id}>`,
+//         });
+
+//         /*
+//           SUCCESS
+//         */
+
+//         await respond(
+
+//           "✅ Task Completed Successfully"
+//         );
+
+//       } catch (error) {
+
+//         console.error(
+//           "❌ Complete Error:",
+//           error
+//         );
+
+//         await respond(
+
+//           "❌ Failed to complete task"
+//         );
+//       }
+//     }
+//   );
+// };

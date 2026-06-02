@@ -1,9 +1,10 @@
 import { App } from "@slack/bolt";
 
 import {
-  readTasks,
-  writeTasks,
-} from "../utils/fileHelper";
+  getTasks,
+  getTaskById,
+  replaceTask,
+} from "../services/taskService";
 
 import {
   buildTaskCard,
@@ -40,9 +41,8 @@ export const registerModifyCommand = (
           READ TASKS
         */
 
-        const tasks =
-          readTasks();
-
+        const tasks: any =
+          await getTasks();
         /*
           FILTER PENDING TASKS
         */
@@ -447,19 +447,15 @@ export const registerModifyCommand = (
             READ TASKS
           */
 
-          const tasks =
-            readTasks();
+          const task: any =
+            await getTaskById(
+              taskId
+            );
 
           /*
             FIND TASK
           */
 
-          const task =
-            tasks.find(
-              (t: any) =>
-                String(t.id) ===
-                String(taskId)
-            );
 
           /*
             TASK NOT FOUND
@@ -525,7 +521,10 @@ export const registerModifyCommand = (
             SAVE DATABASE
           */
 
-          writeTasks(tasks);
+          await replaceTask(
+              taskId,
+              task
+            );
 
           console.log(
             "✅ TASK UPDATED"

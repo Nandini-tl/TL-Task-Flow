@@ -1,9 +1,9 @@
 import { App } from "@slack/bolt";
 
 import {
-  readTasks,
-  writeTasks,
-} from "../utils/fileHelper";
+  createTask,
+  updateTask,
+} from "../services/taskService";
 
 import {
   buildTaskCard,
@@ -746,8 +746,7 @@ export const registerAssignCommand = (
                 TASKS
               */
 
-              const tasks =
-                readTasks();
+              
 
               /*
                 NEW TASK
@@ -802,12 +801,14 @@ export const registerAssignCommand = (
               };
 
               /*
+
                 SAVE
               */
+             
 
-              tasks.push(newTask);
-
-              writeTasks(tasks);
+              await createTask(
+                newTask
+              );
 
               /*
   SEND TO USERS
@@ -925,17 +926,29 @@ await Promise.all(
   SAVE AGAIN
 */
 
-writeTasks(tasks);
+await updateTask(
+    newTask.id,
+    {
+      userMessages:
+        newTask.userMessages,
+    }
+  );
 
-console.log(
-  "✅ TASK SAVED WITH MESSAGE DATA"
-);
+  console.log(
+    "✅ TASK SAVED WITH MESSAGE DATA"
+  );
 
               /*
                 SAVE UPDATED TASK
               */
 
-              writeTasks(tasks);
+              // await updateTask(
+              //   newTask.id,
+              //   {
+              //     userMessages:
+              //       newTask.userMessages,
+              //   }
+              // );
 
               console.log(
                 "✅ TASK DISTRIBUTED"

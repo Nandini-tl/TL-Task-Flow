@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { connectDB } from "./database/mongo";
 
 import { App } from "@slack/bolt";
 import { registerModifyCommand } from "./commands/modify";
@@ -14,9 +15,9 @@ import {
   registerMyTasksCommand,
 } from "./commands/mytasks";
 
-import {
-  registerCompleteCommand,
-} from "./commands/complete";
+// import {
+//   registerCompleteCommand,
+// } from "./commands/complete";
 
 import {
   startReminderService,
@@ -27,9 +28,9 @@ import {
 } from "./services/messageService";
 
 import {
-  readTasks,
-  writeTasks,
-} from "./utils/fileHelper";
+  getTaskById,
+  replaceTask,
+} from "./services/taskService";
 
 import {
   publishDashboard,
@@ -69,7 +70,7 @@ registerAssignCommand(app);
 
 registerMyTasksCommand(app);
 
-registerCompleteCommand(app);
+// registerCompleteCommand(app);
 
 registerViewAssignCommand(app);
 
@@ -198,20 +199,9 @@ app.action(
         READ TASKS
       */
 
-      const tasks =
-        readTasks();
-
-      /*
-        FIND TASK
-      */
-
-      const task =
-        tasks.find(
-
-          (t: any) =>
-
-            String(t.id) ===
-            String(taskId)
+      const task: any =
+        await getTaskById(
+          Number(taskId)
         );
 
       /*
@@ -507,7 +497,10 @@ app.action(
         SAVE
       */
 
-      writeTasks(tasks);
+      await replaceTask(
+        Number(taskId),
+        task
+      );
 
       /*
         DASHBOARD UPDATE
@@ -628,7 +621,19 @@ app.action(
 
 (async () => {
 
-  await app.start();
+  /*
+    CONNECT MONGODB
+  */
+
+  await connectDB();
+
+  /*
+    START SLACK APP
+  */
+
+  await app.start(
+    Number(process.env.PORT) || 3000
+  );
 
   console.log(
     "⚡ Slack Bot Running on Port 3000"
