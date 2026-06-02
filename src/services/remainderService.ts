@@ -7,10 +7,9 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
 import {
-  readTasks,
-  writeTasks,
-} from "../utils/fileHelper";
-
+  getTasks,
+  updateTask,
+} from "./taskService";
 /*
   ENABLE DATE FORMAT
 */
@@ -37,11 +36,10 @@ export const startReminderService = (
 
     async () => {
 
-      const tasks =
-        readTasks();
+      const tasks: any =
+        await getTasks();
 
-      let updated =
-        false;
+    
 
       /*
         LOOP TASKS
@@ -221,8 +219,15 @@ export const startReminderService = (
             task.reminderSent =
               true;
 
-            updated =
-              true;
+            await updateTask(
+
+              task.id,
+
+              {
+                reminderSent:
+                  true,
+              }
+            );
           }
 
           /*
@@ -400,8 +405,15 @@ export const startReminderService = (
             task.overdueSent =
               true;
 
-            updated =
-              true;
+            await updateTask(
+
+              task.id,
+
+              {
+                overdueSent:
+                  true,
+              }
+            );
           }
 
         } catch (error) {
@@ -417,14 +429,7 @@ export const startReminderService = (
         SAVE
       */
 
-      if (
-        updated
-      ) {
 
-        writeTasks(
-          tasks
-        );
-      }
     }
   );
 };
