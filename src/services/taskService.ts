@@ -33,15 +33,70 @@ export const updateTask = async (
   );
 };
 
+// export const replaceTask = async (
+//   taskId: any,
+//   task: any
+// ) => {
+
+//   return await Task.replaceOne(
+//     { id: Number(taskId) },
+//     task
+//   );
+// };
 export const replaceTask = async (
   taskId: any,
   task: any
 ) => {
 
-  return await Task.replaceOne(
-    { id: Number(taskId) },
-    task
+  const result =
+    await Task.findOneAndUpdate(
+
+      {
+        id: Number(taskId),
+      },
+
+      {
+        $set: {
+
+          taskName:
+            task.taskName,
+
+          deadline:
+            task.deadline,
+
+          priority:
+            task.priority,
+
+          status:
+            task.status,
+
+          assignedUsers:
+            task.assignedUsers,
+
+          progress:
+            task.progress,
+
+          reminderSent:
+            task.reminderSent,
+
+          overdueSent:
+            task.overdueSent,
+
+          userMessages:
+            task.userMessages,
+        },
+      },
+
+      {
+        new: true,
+      }
+    );
+
+  console.log(
+    "UPDATED TASK:"
   );
+
+  return result;
 };
 
 export const deleteTask = async (

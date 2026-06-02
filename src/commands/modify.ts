@@ -48,19 +48,19 @@ export const registerModifyCommand = (
         */
 
         const pendingTasks =
-          tasks.filter(
-            (task: any) =>
+  tasks.filter(
+    (task: any) =>
 
-              task.assignedBy ===
-                command.user_id &&
+      task.assignedBy ===
+        command.user_id &&
 
-              String(
-                task.status || ""
-              )
-                .trim()
-                .toLowerCase() ===
-                "pending"
-          );
+      String(
+        task.status || ""
+      )
+        .trim()
+        .toLowerCase() ===
+        "pending"
+  );
 
         /*
           NO TASKS
@@ -462,6 +462,18 @@ export const registerModifyCommand = (
           */
 
           if (!task) {
+            if (
+              String(task.status)
+                .toLowerCase() !==
+              "pending"
+            ) {
+
+              console.log(
+                "❌ TASK ALREADY COMPLETED"
+              );
+
+              return;
+            }
 
             console.log(
               "❌ TASK NOT FOUND"
@@ -521,10 +533,20 @@ export const registerModifyCommand = (
             SAVE DATABASE
           */
 
-          await replaceTask(
-              taskId,
-              task
-            );
+          // await replaceTask(
+          //     taskId,
+          //     task
+          //   );
+          const result =
+  await replaceTask(
+    taskId,
+    task
+  );
+
+console.log(
+  "MODIFY RESULT:",
+  result
+);
 
           console.log(
             "✅ TASK UPDATED"

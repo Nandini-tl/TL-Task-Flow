@@ -1,8 +1,8 @@
 import { App } from "@slack/bolt";
 
 import {
-  readTasks,
-} from "../utils/fileHelper";
+  getTasks,
+} from "./taskService";
 
 export const publishDashboard =
   async (
@@ -16,8 +16,8 @@ export const publishDashboard =
         READ TASKS
       */
 
-      const tasks =
-        readTasks();
+      const tasks: any =
+        await getTasks();
 
       /*
         MANAGER TASKS ONLY

@@ -1,5 +1,7 @@
 import { App } from "@slack/bolt";
-import { readTasks } from "../utils/fileHelper";
+import {
+  getTasks,
+} from "../services/taskService";
 
 export const registerViewAssignCommand = (
   app: App
@@ -21,8 +23,8 @@ export const registerViewAssignCommand = (
         /*
           READ TASKS
         */
-        const tasks =
-          readTasks();
+        const tasks: any =
+          await getTasks();
 
         /*
           FILTER TASKS
